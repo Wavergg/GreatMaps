@@ -62,7 +62,7 @@
             this.gmap.ShowTileGridLines = true;
             this.gmap.Size = new System.Drawing.Size(520, 450);
             this.gmap.TabIndex = 0;
-            this.gmap.Zoom = 12D;
+            this.gmap.Zoom = 15D;
             this.gmap.Resize += new System.EventHandler(this.gmap_Resize);
             // 
             // splitterLeftArea
@@ -149,6 +149,8 @@
             this.Controls.Add(this.textBoxUserID);
             this.Controls.Add(this.splitterLeftArea);
             this.Controls.Add(this.gmap);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

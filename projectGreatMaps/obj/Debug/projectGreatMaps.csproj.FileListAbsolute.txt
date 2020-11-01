@@ -11,3 +11,16 @@ C:\Users\Waver\source\repos\projectGreatMaps\projectGreatMaps\obj\Debug\projectG
 C:\Users\Waver\source\repos\projectGreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.csproj.CopyComplete
 C:\Users\Waver\source\repos\projectGreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.exe
 C:\Users\Waver\source\repos\projectGreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.pdb
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\bin\Debug\projectGreatMaps.exe.config
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\bin\Debug\projectGreatMaps.exe
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\bin\Debug\projectGreatMaps.pdb
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\bin\Debug\GMap.NET.Core.dll
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\bin\Debug\GMap.NET.WindowsForms.dll
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.csprojAssemblyReference.cache
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.Form1.resources
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.Properties.Resources.resources
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.csproj.GenerateResource.cache
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.csproj.CoreCompileInputs.cache
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.csproj.CopyComplete
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.exe
+C:\Users\Waver\source\repos\ProjectDuplicate\GreatMaps\projectGreatMaps\obj\Debug\projectGreatMaps.pdb

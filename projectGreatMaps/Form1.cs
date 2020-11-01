@@ -44,10 +44,9 @@ namespace projectGreatMaps
             gmap.ShowTileGridLines = false;
             gmap.MouseWheelZoomType = MouseWheelZoomType.ViewCenter;
             gmap.MouseWheelZoomEnabled = false;
-            gmap.MouseWheel += Gmap_MouseWheel;
             gmap.MinZoom = 2;
-
-            
+            gmap.MaxZoom = 18;
+            gmap.MouseWheel += Gmap_MouseWheel;
         }
 
         private void GetGeolocationData()
@@ -70,7 +69,7 @@ namespace projectGreatMaps
 
                     if (textBoxUserID.Text == "")
                     {
-                        if (Convert.ToInt32(userid) > 0 && Convert.ToInt32(userid) < 37)
+                        if (Convert.ToInt32(userid) > 0 && Convert.ToInt32(userid) < 37 )
                         {
 
                             GMapMarker marker = new GMarkerGoogle(new PointLatLng(latitude, longitude),
@@ -101,13 +100,11 @@ namespace projectGreatMaps
         private void Gmap_MouseWheel(object sender, MouseEventArgs e)
         {
             //throw new NotImplementedException();
-            if (e.Delta > 0 && gmap.MaxZoom != 18)
+            if (e.Delta > 0 && gmap.Zoom != 18)
             {
-                gmap.MaxZoom += 1;
                 gmap.Zoom += 1;
-            } else if (e.Delta <0 &&gmap.MaxZoom != 2)
+            } else if (e.Delta <0 &&gmap.Zoom != 2)
             {
-                gmap.MaxZoom -= 1;
                 gmap.Zoom -= 1;
             }
         }
@@ -118,19 +115,13 @@ namespace projectGreatMaps
             polygons.Clear();
             markers.Clear();
             points.Clear();
+            polygonsCircle.Clear();
             GetGeolocationData();
         }
 
         private void buttonDrawHull_Click(object sender, EventArgs e)
         {
-            
             points = points.OrderBy(pointX => pointX.YCoordinate).ThenBy(pointX => pointX.XCoordinate).ToList();
-
-            //GMapMarker marker = new GMarkerGoogle(new PointLatLng(points[0].XCoordinate + 1, points[0].YCoordinate),
-            //                GMarkerGoogleType.blue_dot);
-            //marker.ToolTipText = "base";
-            //markers.Markers.Add(marker);
-            //gmap.Overlays.Add(markers);
 
             OrderByExtremity();
             MapHull();
@@ -195,6 +186,7 @@ namespace projectGreatMaps
 
         private void buttonEnclosingCircle_Click(object sender, EventArgs e)
         {
+            
             Position a = null;
             Position b = null;
 
@@ -204,14 +196,8 @@ namespace projectGreatMaps
 
             for (int i = 0; i < hull.Count; i++)
             {
-                for (int j = i + 1; j < hull.Count; j++)
+                for (int j = i+1; j < hull.Count; j++)
                 {
-                    if (highestLength == 0)
-                    {
-                        highestLength = GetLength(hull[i], hull[j]);
-                        a = hull[i];
-                        b = hull[j];
-                    }
                     if (highestLength < GetLength(hull[i], hull[j]))
                     {
                         highestLength = GetLength(hull[i], hull[j]);
@@ -220,35 +206,52 @@ namespace projectGreatMaps
                     }
                 }
             }
-
-            //List<PointLatLng> pointsMap = new List<PointLatLng>();
-
-          
-            //pointsMap.Add(new PointLatLng(a.XCoordinate, a.YCoordinate));
-            //pointsMap.Add(new PointLatLng(b.XCoordinate, b.YCoordinate));
-            //GMapPolygon polygonX = new GMapPolygon(pointsMap, "poly");
-            //polygonsCircle.Polygons.Add(polygonX);
-            //gmap.Overlays.Add(polygonsCircle);
-
+            
             double smallestAngle = 180;
             hull.Remove(a);
             hull.Remove(b);
             for (int i = 0; i < hull.Count; i++)
             {
-                double currentAngle = GetAngle(b, hull[i],a);
+                double currentAngle = GetAngleC(a, b, hull[i]);
                 if(currentAngle != 0 && currentAngle < smallestAngle)
                 {
                     smallestAngle = currentAngle;
                     c = hull[i];
                 }
             }
+            hull.Add(a);
+            hull.Add(b);
 
             Position center;
             double radius;
-            if (GetAngle(b, c,a) > 90 || GetAngle(a,b,c)>90 || GetAngle(c,a,b)>90)
+
+            double angleA = GetAngleA(a, b, c, smallestAngle);
+            double angleB = 180 - smallestAngle - angleA;
+
+            GMapMarker markerA = new GMarkerGoogle(new PointLatLng(a.XCoordinate, a.YCoordinate),
+                            GMarkerGoogleType.red_pushpin);
+            markerA.ToolTipText = "A";
+            markers.Markers.Add(markerA);
+            gmap.Overlays.Add(markers);
+
+            GMapMarker markerB = new GMarkerGoogle(new PointLatLng(b.XCoordinate, b.YCoordinate),
+                            GMarkerGoogleType.purple_pushpin);
+            markerB.ToolTipText = "B";
+            markers.Markers.Add(markerB);
+            gmap.Overlays.Add(markers);
+
+            GMapMarker markerC = new GMarkerGoogle(new PointLatLng(c.XCoordinate, c.YCoordinate),
+                            GMarkerGoogleType.yellow_pushpin);
+            markerC.ToolTipText = "C";
+            markers.Markers.Add(markerC);
+            gmap.Overlays.Add(markers);
+
+            //Check if the a,b,c point which makes a triangle is an obtuse or acute, and determine center and radius.
+            if (smallestAngle > 90 || angleA > 90 || angleB > 90)
             {
-                center = new Position((a.XCoordinate + b.XCoordinate) / 2, (a.YCoordinate + b.YCoordinate) / 2);
-                radius = Math.Sqrt(Math.Pow(a.XCoordinate - center.XCoordinate,2)+Math.Pow(a.YCoordinate - center.YCoordinate,2));
+                center = new Position((a.XCoordinate + b.XCoordinate ) / 2 , (a.YCoordinate + b.YCoordinate) / 2 );
+                //get from one position to center to determine radius
+                radius = GetLength(a, center);
             }
             else
             {
@@ -259,8 +262,8 @@ namespace projectGreatMaps
                 double centerX = 1 / d * (c.YCoordinate * (b.XCoordinate * b.XCoordinate + b.YCoordinate * b.YCoordinate) - b.YCoordinate * (c.XCoordinate * c.XCoordinate + c.YCoordinate * c.YCoordinate));
                 double centerY = 1 / d * (b.XCoordinate * (c.XCoordinate * c.XCoordinate + c.YCoordinate * c.YCoordinate) - c.XCoordinate * (b.XCoordinate * b.XCoordinate + b.YCoordinate * b.YCoordinate));
                 center = new Position(centerX, centerY);
-                radius = Math.Sqrt(Math.Pow(center.XCoordinate, 2) + Math.Pow(center.YCoordinate, 2));
-                center = new Position(a.XCoordinate + center.XCoordinate, a.YCoordinate + center.YCoordinate);
+                radius = Math.Sqrt(Math.Pow(center.XCoordinate, 2) + Math.Pow(center.YCoordinate, 2)) *1.4;
+                center = new Position(a.XCoordinate + center.XCoordinate , a.YCoordinate + center.YCoordinate );
             }
 
             GMapMarker marker = new GMarkerGoogle(new PointLatLng(center.XCoordinate, center.YCoordinate),
@@ -275,15 +278,16 @@ namespace projectGreatMaps
         private void DrawCircle(Position center, double radius)
         {
             int segments = 360;
+           
             List<PointLatLng> gpollist = new List<PointLatLng>();
-
+          
             double seg = Math.PI * 2 / segments;
 
             for (int i = 0; i < segments; i++)
             {
                 double theta = seg * i;
-                double a = center.XCoordinate + Math.Cos(theta) * radius ;
-                double b = center.YCoordinate + Math.Sin(theta) * radius ;
+                double a = center.XCoordinate + (Math.Cos(theta) * radius) /1.4;
+                double b = center.YCoordinate + Math.Sin(theta) * radius;
 
                 PointLatLng gpoi = new PointLatLng(a, b);
 
@@ -297,21 +301,37 @@ namespace projectGreatMaps
             gmap.Zoom = gmap.Zoom - 1;
         }
 
-        private double GetAngle(Position a, Position b, Position c)
+
+        private double GetAngleC(Position a, Position b, Position c)
         {
-            double cBase = GetLength(a, b);
             double aLength = GetLength(b, c);
+            double kLength = GetLength(a, b);
             double bLength = GetLength(a, c);
 
-            double cosC = (Math.Pow(aLength, 2) + Math.Pow(bLength, 2) - Math.Pow(cBase, 2)) / (2 * aLength * bLength);
+            double combineLength = Math.Pow(kLength,2) - ( Math.Pow(aLength, 2) + Math.Pow(bLength, 2));
+            double cosC = combineLength / - (2 * (aLength * bLength));
 
-            double angle = Math.Acos(cosC) * 180 / Math.PI;
-            return angle;
+            double angleC = Math.Acos(cosC) * 180 / Math.PI;
+            return angleC;
+        }
+
+        private double GetAngleA(Position a, Position b, Position c, double angleC)
+        {
+            angleC = angleC / 180 * Math.PI;
+            double aLength = GetLength(b,c);
+            double kLength = GetLength(a,b);
+            double sinA = (aLength * Math.Sin(angleC)) / kLength;
+            double angleA = Math.Abs(Math.Asin(sinA) * 180 / Math.PI);
+            return angleA;
         }
 
         private double GetLength(Position a, Position b)
         {
+            a.XCoordinate = a.XCoordinate * 1.4;
+            b.XCoordinate = b.XCoordinate * 1.4;
             double result = Math.Sqrt(Math.Pow(b.XCoordinate - a.XCoordinate, 2) + Math.Pow(b.YCoordinate - a.YCoordinate, 2));
+            a.XCoordinate = a.XCoordinate / 1.4;
+            b.XCoordinate = b.XCoordinate / 1.4;
             return result;
         }
 
